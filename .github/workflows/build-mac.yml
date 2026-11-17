@@ -6,22 +6,33 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code & submodules
+        uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Setup Node
+          fetch-depth: 0
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
       - name: Install dependencies
         run: npm ci
-      - name: Build Mac
+
+      - name: Build Mac universal dmg
         run: npm run build -- --mac
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TVBox-Mac
+          name: TVBox-Mac-universal
           path: release/*.dmg
