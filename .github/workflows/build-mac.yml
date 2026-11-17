@@ -1,0 +1,27 @@
+name: Build Mac DMG
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Mac
+        run: npm run build -- --mac
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TVBox-Mac
+          path: release/*.dmg
